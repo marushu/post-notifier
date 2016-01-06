@@ -5,13 +5,10 @@ Version: 0.5
 Description: Send information to the specified e-mail address when the post published.
 Author: Shuhei Nishimura
 Author URI: http://private.hibou-web.com
-Plugin URI:
+Plugin URI: https://github.com/marushu/post-notifier
 Text Domain: post_notifier
 Domain Path: /languages
 */
-
-register_activation_hook( __FILE__, array( 'Post_Notifier', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'Post_Notifier', 'deactivate' ) );
 
 if( class_exists( 'Post_Notifier' ) )
 	$post_notifier = new Post_Notifier();
