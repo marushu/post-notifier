@@ -19,12 +19,19 @@ class Post_Notifier {
 	function __construct() {
 
 		add_action( 'transition_post_status', array( $this, 'post_published_notification' ), 10, 3 );
-		add_filter( 'wp_mail_charset', array( $this, 'change_mail_charset' ) );
+		add_action("plugins_loaded", array( $this, 'plugins_loaded') );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'settings_init' ) );
 
 	}
 
+	public function plugins_loaded() {
+		load_plugin_textdomain(
+			"post_notifier",
+			false,
+			dirname( plugin_basename( __FILE__ ) ) . '/languages'
+		);
+	}
 
 	public function post_published_notification( $new_status, $old_status, $post ) {
 
@@ -281,7 +288,7 @@ class Post_Notifier {
 				}
 			}
 
-			echo __( '<p>Select the post type you want to send at the time of publication.<br /><strong>Multiple selectable</strong> with Control key.</p>', 'post_notifier' );
+			echo __( '<p>Select the post type you want to send at the time of publication.</p>', 'post_notifier' );
 
 		}
 
@@ -296,7 +303,7 @@ class Post_Notifier {
 		<input type="text" name="post_notifier_settings[sender_email_field]" value="<?php echo $sender_email; ?>" size="30" maxlength="30">
 
 		<?php
-		echo __( '<p>Sender e-mail address is <strong>single</strong>.</p><p>If empty, use the administrator\'s e-mail .</p>', 'post_notifier' );
+		echo __( '<p>Sender e-mail address is <strong>single</strong>.</p>', 'post_notifier' );
 
 	}
 
