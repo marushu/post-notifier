@@ -14,23 +14,23 @@ msgstr ""
 
 #: posts-notifier.php:141
 msgid "Check your email address."
-msgstr ""
+msgstr "メールアドレスを確認してください。"
 
 #: posts-notifier.php:175 posts-notifier.php:228
 msgid "Select the post type"
-msgstr ""
+msgstr "投稿タイプを選択"
 
 #: posts-notifier.php:213
 msgid "Post Notifier settings"
-msgstr ""
+msgstr "Post Notifier 設定"
 
 #: posts-notifier.php:220
 msgid "Set e-mail"
-msgstr ""
+msgstr "送信先メールアドレス"
 
 #: posts-notifier.php:236
 msgid "Set sender email"
-msgstr ""
+msgstr "送信元メールアドレス"
 
 #: posts-notifier.php:246
 msgid "This section description"
@@ -39,16 +39,16 @@ msgstr ""
 #: posts-notifier.php:261
 msgid ""
 "<p>Set e-mail you want to send in a <strong>comma-separated</strong>.</p>"
-msgstr ""
+msgstr "<p>カンマ区切りでメールアドレスを設定</p>"
 
 #: posts-notifier.php:299
 msgid ""
 "<p>Select the post type you want to send at the time of publication.</p>"
-msgstr ""
+msgstr "<p>公開時送信したい投稿タイプを選択。</p>"
 
 #: posts-notifier.php:314
 msgid "<p>Sender e-mail address is <strong>single</strong>.</p>"
-msgstr ""
+msgstr "<p>送信元メールアドレス<strong>（単一）</strong></p>"
 
 #. Plugin Name of the plugin/theme
 msgid "Post Notifier"
@@ -61,7 +61,7 @@ msgstr ""
 #. Description of the plugin/theme
 msgid ""
 "Send information to the specified e-mail address when the post published."
-msgstr ""
+msgstr "投稿公開時に指定したメールアドレスへ投稿情報を送信します。"
 
 #. Author of the plugin/theme
 msgid "Shuhei Nishimura"
