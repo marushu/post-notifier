@@ -1,30 +1,44 @@
 <?php
-/*
-Plugin Name: Post Notifier
-Version: 0.5
-Description: Send information to the specified e-mail address when the post published.
-Author: Shuhei Nishimura
-Author URI: http://private.hibou-web.com
-Plugin URI: https://github.com/marushu/post-notifier
-Text Domain: post-notifier
-Domain Path: /languages
-*/
+/**
+ * Plugin Name: Post Notifier
+ * Version: 0.5
+ * Description: Send information to the specified e-mail address when the post published.
+ * Author: Shuhei Nishimura
+ * Author URI: http://private.hibou-web.com
+ * Plugin URI: https://github.com/marushu/post-notifier
+ * Text Domain: post-notifier
+ * Domain Path: /languages
+ * @package Post Notifier
+ */
 
-if( class_exists( 'Post_Notifier' ) )
+if ( class_exists( 'Post_Notifier' ) ) {
 	$post_notifier = new Post_Notifier();
+}
 
-
+/**
+ * Summary.
+ *
+ * @since x.x.x
+ * @access (private, protected, or public)
+ * @var type $var Description.
+ */
 class Post_Notifier {
 
+	/**
+	 * Post_Notifier constructor.
+	 */
 	function __construct() {
 
 		add_action( 'transition_post_status', array( $this, 'post_published_notification' ), 10, 3 );
-		add_action( 'plugins_loaded', array( $this, 'load_textdomain') );
+		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'settings_init' ) );
 
 	}
 
+	/**
+	 * Load textdomain
+	 */
 	public function load_textdomain() {
 		load_plugin_textdomain(
 			'post-notifier',
@@ -33,53 +47,56 @@ class Post_Notifier {
 		);
 	}
 
+	/**
+	 * Send specific e-mail when post status is published.
+	 *
+	 * @param string $new_status after published.
+	 * @param string $old_status before published.
+	 * @param object $post post object.
+	 */
 	public function post_published_notification( $new_status, $old_status, $post ) {
 
 		$options = get_option( 'post_notifier_settings' );
-		$emails  = isset( $options[ 'email_field' ] )
-			? $options[ 'email_field' ]
+		$emails  = isset( $options['email_field'] )
+			? $options['email_field']
 			: '';
-		$post_types = isset( $options[ 'post_type_field' ] )
-			? $options[ 'post_type_field' ]
+		$post_types = isset( $options['post_type_field'] )
+			? $options['post_type_field']
 			: '';
-		$sender_email = isset( $options[ 'sender_email_field' ] )
-			? $options[ 'sender_email_field' ]
+		$sender_email = isset( $options['sender_email_field'] )
+			? $options['sender_email_field']
 			: get_option( 'admin_email' );
-
-		//$author  = $post->post_author; /* Post author ID. */
-		//$name    = get_the_author_meta( 'display_name', $author );
-		//$email     = array( 'trigger@recipe.ifttt.com', 'info@hibou-web.com' );
 
 		$title     = wp_trim_words( esc_html( $post->post_title ), 100, '…' );
 		$permalink = esc_url( get_permalink( intval( $post->ID ) ) );
-		//$edit    = get_edit_post_link( $ID, '' );
 		$message = '';
 		$attachments = array();
 
 		/**
-		 * get post thumbnail
+		 * Get post thumbnail
 		 */
+
 		$post_thumbnail = '';
 
 		if ( has_post_thumbnail() ) {
 			$post_thumbnail_id    = get_post_thumbnail_id( $post->ID );
 			$post_thumbnail_datas = wp_get_attachment_image_src( $post_thumbnail_id, 'full' );
-			$attachments[]        = esc_url( $post_thumbnail_datas[ 0 ] );
+			$attachments[]        = esc_url( $post_thumbnail_datas[0] );
 
 			/**
-			 * if use ifttt and throw twitter with attachent, must get full path of post thumbnail...
+			 * If use ifttt and throw twitter with attachent, must get full path of post thumbnail...
 			 */
+
 			$upload_dir = wp_upload_dir();
 
-			$basedir = $upload_dir[ 'basedir' ];
+			$basedir = $upload_dir['basedir'];
 
-			$for_full_path = esc_url( $post_thumbnail_datas[ 0 ] );
+			$for_full_path = esc_url( $post_thumbnail_datas[0] );
 			$for_full_path = explode( '/uploads', $for_full_path );
 
-			$full_path = $basedir . $for_full_path[ 1 ];
+			$full_path = $basedir . $for_full_path[1];
 
 			$attachments[] = $full_path;
-
 
 		} else {
 			$attachments[] = '';
@@ -88,33 +105,26 @@ class Post_Notifier {
 		$post_content = wp_strip_all_tags( $post->post_content );
 		$post_content = wp_trim_words( $post_content, 50, '…' );
 
-		foreach ( (array)$emails as $email ) {
-			if ( ! is_email( $email ) )
+		foreach ( (array) $emails as $email ) {
+			if ( ! is_email( $email ) ) {
 				return;
+			}
 
-			//$to[] = sprintf( '%s <%s>', $name, sanitize_email( $email ) );
 			$to[] = sprintf( '%s', sanitize_email( $email ) );
 			$headers[] = 'Bcc:' . sanitize_email( $email );
 		}
 		$subject = sprintf( '%s' . PHP_EOL, trim( $title ) );
-		//$message = sprintf ('%s %s' . "\n\n", $title, $permalink );
-		//$message .= sprintf( '%s' . "\r\n" . '%s', $permalink, esc_html( $post_content ) );
 		$message .= sprintf( '%s' . PHP_EOL, trim( $permalink ) );
-		//$message .= sprintf( '%s' . PHP_EOL, trim( esc_html( $post_content ) ) );
 		$headers[] = 'From:' . sanitize_email( $sender_email );
-		//$headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
 		/**
-		 * check post status if post status is 'publish' is no fire
+		 * Check post status if post status is 'publish' is no fire
 		 */
-		if ( in_array( $post->post_type, $post_types ) && $new_status === 'publish' && $old_status !== 'publish' ) {
 
-			//$from_email = get_option( 'admin_email' );
+		if ( in_array( $post->post_type, $post_types, true ) && 'publish' === $new_status && 'publish' !== $old_status ) {
 
 			add_filter( 'wp_mail_from', function( $sender_email ) {
-
 				return sanitize_email( $sender_email );
-
 			});
 
 			wp_mail( $to, $subject, $message, $headers, $attachments );
@@ -123,21 +133,24 @@ class Post_Notifier {
 	}
 
 	/**
-	 * @param $emails
+	 * Data sanitize.
+	 *
+	 * @param email, post-types $input Posted datas.
 	 * @return mixed
 	 */
 	public function data_sanitize( $input ) {
 
 		/**
-		 * email
+		 * Email
 		 */
+
 		$this->options = get_option( 'post_notifier_settings' );
 		$new_input     = array();
 		$shaped_emails = array();
 
-		$emails = explode( ',', $input[ 'email_field' ] );
+		$emails = explode( ',', $input['email_field'] );
 		if ( ! empty( $emails ) ) {
-			foreach ( (array)$emails as $email ) {
+			foreach ( (array) $emails as $email ) {
 
 				$email = sanitize_email( $email );
 
@@ -149,22 +162,23 @@ class Post_Notifier {
 						__( 'Check your email address.', 'post-notifier' ),
 						'error'
 					);
-					$new_input[ 'email_field' ] = isset( $this->options[ 'email_field' ] ) ? $shaped_emails : '';
+					$new_input['email_field'] = isset( $this->options['email_field'] ) ? $shaped_emails : '';
 
-				} else { // success!
+				} else { // Success!
 
 					$shaped_emails[]            = $email;
-					$new_input[ 'email_field' ] = isset( $this->options[ 'email_field' ] ) ? $shaped_emails : '';
+					$new_input['email_field'] = isset( $this->options['email_field'] ) ? $shaped_emails : '';
 
 				}
 			}
 		}
 
 		/**
-		 * post type
+		 * Post type
 		 */
-		$post_types = $input[ 'post_type_field' ];
-		if( ! empty( $post_types ) ) {
+
+		$post_types = $input['post_type_field'];
+		if ( ! empty( $post_types ) ) {
 
 			$selected_post_types = array();
 			foreach ( $post_types as $post_type ) {
@@ -173,7 +187,7 @@ class Post_Notifier {
 
 			}
 
-			$new_input[ 'post_type_field' ] = isset( $this->options[ 'post_type_field' ] ) ? $selected_post_types : '';
+			$new_input['post_type_field'] = isset( $this->options['post_type_field'] ) ? $selected_post_types : '';
 
 		} else {
 
@@ -183,21 +197,24 @@ class Post_Notifier {
 				__( 'Select the post type', 'post-notifier' ),
 				'error'
 			);
-			$new_input[ 'post_type_field' ] = '';
+			$new_input['post_type_field'] = '';
 
 		}
 
 		/**
 		 * Sender email
 		 */
-		$sender_email = isset( $input[ 'sender_email_field' ] ) ? sanitize_email( $input[ 'sender_email_field' ] ) : '';
-		$new_input[ 'sender_email_field' ] = ! empty( $sender_email ) ? $sender_email : '';
 
+		$sender_email = isset( $input['sender_email_field'] ) ? sanitize_email( $input['sender_email_field'] ) : '';
+		$new_input['sender_email_field'] = ! empty( $sender_email ) ? $sender_email : '';
 
 		return $new_input;
 
 	}
 
+	/**
+	 * Add admin menu
+	 */
 	public function admin_menu() {
 		add_options_page(
 			'Post Notifier',
@@ -208,6 +225,9 @@ class Post_Notifier {
 		);
 	}
 
+	/**
+	 * Register settings.
+	 */
 	public function settings_init() {
 
 		register_setting(
@@ -249,29 +269,38 @@ class Post_Notifier {
 
 	}
 
+	/**
+	 * Add description of Post Notifier.
+	 */
 	public function post_notifier_settings_section_callback() {
 
-		echo __( 'Set e-mail, select post-type', 'post-notifier' );
+		echo esc_attr__( 'Set e-mail, select post-type', 'post-notifier' );
 
 	}
 
+	/**
+	 * Output text field.
+	 */
 	public function email_field_render() {
 
 		$options = get_option( 'post_notifier_settings' );
-		$emails  = isset( $options[ 'email_field' ] ) ? $options[ 'email_field' ] : '';
+		$emails  = isset( $options['email_field'] ) ? $options['email_field'] : '';
 		$emails  = ! empty( $emails ) && is_array( $emails ) ? implode( ', ', $emails ) : '';
 
 		?>
 		<textarea name="post_notifier_settings[email_field]" id="" cols="60" width="auto" height="auto"
-							rows="5"><?php echo $emails; ?></textarea>
+							rows="5"><?php echo esc_html( $emails ); ?></textarea>
 		<?php
 
 	}
 
+	/**
+	 * Output post-type checkbox.
+	 */
 	public function post_type_render() {
 
 		$options             = get_option( 'post_notifier_settings' );
-		$selected_post_types = isset( $options[ 'post_type_field' ] ) ? $options[ 'post_type_field' ] : '';
+		$selected_post_types = isset( $options['post_type_field'] ) ? $options['post_type_field'] : '';
 
 		$args       = array(
 			'public'  => true,
@@ -282,43 +311,43 @@ class Post_Notifier {
 
 		if ( ! empty( $post_types ) ) {
 
-			for( $i = 0; $i < $count; $i++ ) {
-				if( $post_types[ $i ] !== 'attachment' ) {
+			for ( $i = 0; $i < $count; $i++ ) {
+				if ( 'attachment' !== $post_types[ $i ] ) {
 					?>
 
 					<p>
 						<input value="<?php echo esc_html( $post_types[ $i ] ); ?>" name="post_notifier_settings[post_type_field][]"
 									 type="checkbox"
-									 id="check-<?php echo esc_html( $post_types[ $i ] ); ?>"
-							<?php
-								if( ! empty( $selected_post_types ) && in_array( $post_types[ $i ], $selected_post_types ) )
-									echo 'checked="selected"';
-							?>>
+									 id="check-<?php echo esc_html( $post_types[ $i ] ); ?>"<?php if ( ! empty( $selected_post_types ) && in_array( $post_types[ $i ], $selected_post_types, true ) ) { echo 'checked="selected"'; } ?>>
 						<label
 							for="check-<?php echo esc_html( $post_types[ $i ] ); ?>"><?php echo esc_html( $post_types[ $i ] ); ?></label>
 					</p>
 
 					<?php
-					
 				}
 			}
-
 		}
 
 	}
 
+	/**
+	 * Output Sender e-mail field.
+	 */
 	public function from_email_render() {
 
 		$options      = get_option( 'post_notifier_settings' );
-		$sender_email = isset( $options[ 'sender_email_field' ] ) ? sanitize_email( $options[ 'sender_email_field' ] ) : '';
+		$sender_email = isset( $options['sender_email_field'] ) ? sanitize_email( $options['sender_email_field'] ) : '';
 		?>
 
-		<input type="text" name="post_notifier_settings[sender_email_field]" value="<?php echo $sender_email; ?>" size="30" maxlength="30">
+		<input type="text" name="post_notifier_settings[sender_email_field]" value="<?php echo esc_html( $sender_email ); ?>" size="30" maxlength="30">
 
 		<?php
 
 	}
 
+	/**
+	 * Output Post Notifier page form.
+	 */
 	public function post_notifier_options_page() {
 
 		?>
