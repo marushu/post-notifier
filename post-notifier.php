@@ -66,7 +66,9 @@ class Post_Notifier {
 			$post_thumbnail_datas = wp_get_attachment_image_src( $post_thumbnail_id, 'full' );
 			$attachments[]        = esc_url( $post_thumbnail_datas[ 0 ] );
 
-			// if use ifttt and throw twitter with attachent, must get full path of post thumbnail...
+			/**
+			 * if use ifttt and throw twitter with attachent, must get full path of post thumbnail...
+			 */
 			$upload_dir = wp_upload_dir();
 
 			$basedir = $upload_dir[ 'basedir' ];
@@ -105,7 +107,7 @@ class Post_Notifier {
 		/**
 		 * check post status if post status is 'publish' is no fire
 		 */
-		if ( in_array( $post->post_type, $post_types ) && $new_status == 'publish' && $old_status != 'publish' ) {
+		if ( in_array( $post->post_type, $post_types ) && $new_status === 'publish' && $old_status !== 'publish' ) {
 
 			//$from_email = get_option( 'admin_email' );
 
