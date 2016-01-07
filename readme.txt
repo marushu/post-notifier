@@ -29,10 +29,6 @@ What's sent?
 6. Set senter e-mail.
 7. Click save.
 
-== Frequently Asked Questions ==
-
-== Screenshots ==
-
 == Changelog ==
 
 = 0.5 =
