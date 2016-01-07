@@ -6,7 +6,7 @@ Description: Send information to the specified e-mail address when the post publ
 Author: Shuhei Nishimura
 Author URI: http://private.hibou-web.com
 Plugin URI: https://github.com/marushu/post-notifier
-Text Domain: post_notifier
+Text Domain: post-notifier
 Domain Path: /languages
 */
 
@@ -19,17 +19,17 @@ class Post_Notifier {
 	function __construct() {
 
 		add_action( 'transition_post_status', array( $this, 'post_published_notification' ), 10, 3 );
-		add_action("plugins_loaded", array( $this, 'plugins_loaded') );
+		add_action( 'plugins_loaded', array( $this, 'load_textdomain') );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'settings_init' ) );
 
 	}
 
-	public function plugins_loaded() {
+	public function load_textdomain() {
 		load_plugin_textdomain(
-			"post_notifier",
+			'post-notifier',
 			false,
-			dirname( plugin_basename( __FILE__ ) ) . '/languages'
+			plugin_basename( dirname( __FILE__ ) ) . '/languages'
 		);
 	}
 
@@ -54,19 +54,33 @@ class Post_Notifier {
 		$permalink = esc_url( get_permalink( intval( $post->ID ) ) );
 		//$edit    = get_edit_post_link( $ID, '' );
 		$message = '';
+		$attachments = array();
 
 		/**
-		 * get post's image ( postthumbnail or first image )
+		 * get post thumbnail
 		 */
 		$post_thumbnail = '';
-		$post_content   = $post->post_content;
 
 		if ( has_post_thumbnail() ) {
 			$post_thumbnail_id    = get_post_thumbnail_id( $post->ID );
 			$post_thumbnail_datas = wp_get_attachment_image_src( $post_thumbnail_id, 'full' );
-			$attachments          = esc_url( $post_thumbnail_datas[ 0 ] );
+			$attachments[]        = esc_url( $post_thumbnail_datas[ 0 ] );
+
+			// if use ifttt and throw twitter with attachent, must get full path of post thumbnail...
+			$upload_dir = wp_upload_dir();
+
+			$basedir = $upload_dir[ 'basedir' ];
+
+			$for_full_path = esc_url( $post_thumbnail_datas[ 0 ] );
+			$for_full_path = explode( '/uploads', $for_full_path );
+
+			$full_path = $basedir . $for_full_path[ 1 ];
+
+			$attachments[] = $full_path;
+
+
 		} else {
-			$attachments = '';
+			$attachments[] = '';
 		}
 
 		$post_content = wp_strip_all_tags( $post->post_content );
@@ -101,7 +115,7 @@ class Post_Notifier {
 
 			});
 
-			wp_mail( $to, $subject, $message, $headers, array( '/var/www/vhosts/test.hibou.jp/wp-content/uploads/2015/12/19513737491_a22632f7a3_o.jpg' ) );
+			wp_mail( $to, $subject, $message, $headers, $attachments );
 
 		}
 	}
@@ -130,7 +144,7 @@ class Post_Notifier {
 					add_settings_error(
 						'post_notifier_settings',
 						'email_field',
-						__( 'Check your email address.', 'post_notifier' ),
+						__( 'Check your email address.', 'post-notifier' ),
 						'error'
 					);
 					$new_input[ 'email_field' ] = isset( $this->options[ 'email_field' ] ) ? $shaped_emails : '';
@@ -164,7 +178,7 @@ class Post_Notifier {
 			add_settings_error(
 				'post_notifier_settings',
 				'post_type_field',
-				__( 'Select the post type', 'post_notifier' ),
+				__( 'Select the post type', 'post-notifier' ),
 				'error'
 			);
 			$new_input[ 'post_type_field' ] = '';
@@ -202,14 +216,14 @@ class Post_Notifier {
 
 		add_settings_section(
 			'post_notifier_notifierpage_section',
-			__( 'Post Notifier settings', 'post_notifier' ),
+			__( 'Post Notifier settings', 'post-notifier' ),
 			array( $this, 'post_notifier_settings_section_callback' ),
 			'notifierpage'
 		);
 
 		add_settings_field(
 			'email_field',
-			__( 'Set e-mail', 'post_notifier' ),
+			__( 'Set e-mail<br /><p>(Comma-separated)</p>', 'post-notifier' ),
 			array( $this, 'email_field_render' ),
 			'notifierpage',
 			'post_notifier_notifierpage_section'
@@ -217,7 +231,7 @@ class Post_Notifier {
 
 		add_settings_field(
 			'post_type_field',
-			__( 'Select the post type', 'post_notifier' ),
+			__( 'Select the post type', 'post-notifier' ),
 			array( $this, 'post_type_render' ),
 			'notifierpage',
 			'post_notifier_notifierpage_section'
@@ -225,7 +239,7 @@ class Post_Notifier {
 
 		add_settings_field(
 			'sender_email_field',
-			__( 'Set sender email', 'post_notifier' ),
+			__( 'Set sender email', 'post-notifier' ),
 			array( $this, 'from_email_render' ),
 			'notifierpage',
 			'post_notifier_notifierpage_section'
@@ -235,7 +249,7 @@ class Post_Notifier {
 
 	public function post_notifier_settings_section_callback() {
 
-		echo __( 'This section description', 'post_notifier' );
+		echo __( 'Set e-mail, select post-type', 'post-notifier' );
 
 	}
 
@@ -249,8 +263,6 @@ class Post_Notifier {
 		<textarea name="post_notifier_settings[email_field]" id="" cols="60" width="auto" height="auto"
 							rows="5"><?php echo $emails; ?></textarea>
 		<?php
-
-		echo __( '<p>Set e-mail you want to send in a <strong>comma-separated</strong>.</p>', 'post_notifier' );
 
 	}
 
@@ -285,10 +297,9 @@ class Post_Notifier {
 					</p>
 
 					<?php
+					
 				}
 			}
-
-			echo __( '<p>Select the post type you want to send at the time of publication.</p>', 'post_notifier' );
 
 		}
 
@@ -303,7 +314,6 @@ class Post_Notifier {
 		<input type="text" name="post_notifier_settings[sender_email_field]" value="<?php echo $sender_email; ?>" size="30" maxlength="30">
 
 		<?php
-		echo __( '<p>Sender e-mail address is <strong>single</strong>.</p>', 'post_notifier' );
 
 	}
 
