@@ -42,7 +42,7 @@ class Post_Notifier {
 	public function activate() {
 
 		$post_notifier_settings = get_option( 'post_notifier_settings' );
-		if( empty( $post_notifier_settings ) ) {
+		if ( empty( $post_notifier_settings ) ) {
 			$default_value = array(
 				'email_field'        => array(),
 				'post_type_field'    => array(),
@@ -92,8 +92,6 @@ class Post_Notifier {
 		/**
 		 * Get post thumbnail
 		 */
-		$post_thumbnail = '';
-
 		if ( has_post_thumbnail() ) {
 			$post_thumbnail_id    = get_post_thumbnail_id( $post->ID );
 			$post_thumbnail_datas = wp_get_attachment_image_src( $post_thumbnail_id, 'full' );
@@ -102,17 +100,16 @@ class Post_Notifier {
 			/**
 			 * If use ifttt and throw twitter with attachent, must get full path of post thumbnail...
 			 */
-			$upload_dir = wp_upload_dir();
-			$basedir = $upload_dir['basedir'];
+			$upload_dir    = wp_upload_dir();
+			$basedir       = $upload_dir['basedir'];
 			$for_full_path = esc_url( $post_thumbnail_datas[0] );
 
-			if( ! empty( $for_full_path ) ) {
+			if ( ! empty( $for_full_path ) ) {
 				$for_full_path = explode( '/uploads', $for_full_path );
-				$full_path     = $basedir . $for_full_path[ 1 ];
+				$full_path     = $basedir . $for_full_path[1];
 
 				$attachments[] = $full_path;
 			}
-
 		} else {
 			$attachments[] = '';
 		}
@@ -217,7 +214,7 @@ class Post_Notifier {
 		 * Sender email
 		 */
 		$sender_email                      = isset( $input['sender_email_field'] ) ? sanitize_email( $input['sender_email_field'] ) : '';
-		$new_input['sender_email_field']   = ! empty( $sender_email ) ? $sender_email : '';
+		$new_input['sender_email_field'] = ! empty( $sender_email ) ? $sender_email : '';
 
 		return $new_input;
 
