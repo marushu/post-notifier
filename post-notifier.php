@@ -74,7 +74,6 @@ class Post_Notifier {
 		/**
 		 * Get post thumbnail
 		 */
-
 		$post_thumbnail = '';
 
 		if ( has_post_thumbnail() ) {
@@ -85,7 +84,6 @@ class Post_Notifier {
 			/**
 			 * If use ifttt and throw twitter with attachent, must get full path of post thumbnail...
 			 */
-
 			$upload_dir = wp_upload_dir();
 			$basedir = $upload_dir['basedir'];
 			$for_full_path = esc_url( $post_thumbnail_datas[0] );
@@ -119,7 +117,6 @@ class Post_Notifier {
 		/**
 		 * Check post status if post status is 'publish' is no fire
 		 */
-
 		if ( in_array( $post->post_type, $post_types, true ) && 'publish' === $new_status && 'publish' !== $old_status ) {
 
 			add_filter( 'wp_mail_from', function( $sender_email ) {
@@ -142,7 +139,6 @@ class Post_Notifier {
 		/**
 		 * Email
 		 */
-
 		$this->options = get_option( 'post_notifier_settings' );
 		$new_input     = array();
 		$shaped_emails = array();
@@ -179,7 +175,6 @@ class Post_Notifier {
 		/**
 		 * Post type
 		 */
-
 		$post_types = $input['post_type_field'];
 		if ( ! empty( $post_types ) ) {
 
