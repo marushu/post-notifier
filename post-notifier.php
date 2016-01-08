@@ -32,6 +32,24 @@ class Post_Notifier {
 		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'settings_init' ) );
+		register_activation_hook( __FILE__, array( $this, 'activate' ) );
+
+	}
+
+	/**
+	 * Activation.
+	 */
+	public function activate() {
+
+		$post_notifier_settings = get_option( 'post_notifier_settings' );
+		if( empty( $post_notifier_settings ) ) {
+			$default_value = array(
+				'email_field'        => array(),
+				'post_type_field'    => array(),
+				'sender_email_field' => '',
+			);
+			update_option( 'post_notifier_settings', $default_value );
+		}
 
 	}
 
@@ -149,7 +167,7 @@ class Post_Notifier {
 
 				$email = sanitize_email( $email );
 
-				if ( ! is_email( $email ) || empty( $email ) || isset( $this->options['email_field'] ) === '' ) {
+				if ( ! is_email( $email ) || empty( $email ) ) {
 
 					add_settings_error(
 						'post_notifier_settings',
@@ -157,16 +175,12 @@ class Post_Notifier {
 						__( 'Check your email address.', 'post-notifier' ),
 						'error'
 					);
-					$new_input['email_field'] = isset( $this->options['email_field'] )
-						? $shaped_emails
-						: '';
+					$new_input['email_field'] = isset( $this->options['email_field'] ) ? $shaped_emails : '';
 
 				} else { // Success!
 
 					$shaped_emails[]            = $email;
-					$new_input['email_field'] = isset( $this->options['email_field'] )
-						? $shaped_emails
-						: '';
+					$new_input['email_field'] = isset( $this->options['email_field'] ) ? $shaped_emails : '';
 
 				}
 			}
@@ -185,9 +199,7 @@ class Post_Notifier {
 
 			}
 
-			$new_input['post_type_field'] = isset( $this->options['post_type_field'] )
-				? $selected_post_types
-				: '';
+			$new_input['post_type_field'] = isset( $this->options['post_type_field'] ) ? $selected_post_types : '';
 
 		} else {
 
@@ -204,13 +216,8 @@ class Post_Notifier {
 		/**
 		 * Sender email
 		 */
-
-		$sender_email                    = isset( $input['sender_email_field'] )
-			? sanitize_email( $input['sender_email_field'] )
-			: '';
-		$new_input['sender_email_field'] = ! empty( $sender_email )
-			? $sender_email
-			: '';
+		$sender_email                      = isset( $input['sender_email_field'] ) ? sanitize_email( $input['sender_email_field'] ) : '';
+		$new_input['sender_email_field']   = ! empty( $sender_email ) ? $sender_email : '';
 
 		return $new_input;
 
