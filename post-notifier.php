@@ -87,15 +87,15 @@ class Post_Notifier {
 			 */
 
 			$upload_dir = wp_upload_dir();
-
 			$basedir = $upload_dir['basedir'];
-
 			$for_full_path = esc_url( $post_thumbnail_datas[0] );
-			$for_full_path = explode( '/uploads', $for_full_path );
 
-			$full_path = $basedir . $for_full_path[1];
+			if( ! empty( $for_full_path ) ) {
+				$for_full_path = explode( '/uploads', $for_full_path );
+				$full_path     = $basedir . $for_full_path[ 1 ];
 
-			$attachments[] = $full_path;
+				$attachments[] = $full_path;
+			}
 
 		} else {
 			$attachments[] = '';
