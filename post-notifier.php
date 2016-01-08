@@ -152,8 +152,9 @@ class Post_Notifier {
 			foreach ( (array) $emails as $email ) {
 
 				$email = sanitize_email( $email );
+				//$post_email = $_POST['email_field'];
 
-				if ( ! is_email( $email ) || empty( $email ) ) {
+				if ( ! is_email( $email ) || empty( $email ) || isset( $this->options['email_field'] ) === '' ) {
 
 					add_settings_error(
 						'post_notifier_settings',
