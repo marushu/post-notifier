@@ -152,7 +152,6 @@ class Post_Notifier {
 			foreach ( (array) $emails as $email ) {
 
 				$email = sanitize_email( $email );
-				//$post_email = $_POST['email_field'];
 
 				if ( ! is_email( $email ) || empty( $email ) || isset( $this->options['email_field'] ) === '' ) {
 
@@ -162,12 +161,16 @@ class Post_Notifier {
 						__( 'Check your email address.', 'post-notifier' ),
 						'error'
 					);
-					$new_input['email_field'] = isset( $this->options['email_field'] ) ? $shaped_emails : '';
+					$new_input['email_field'] = isset( $this->options['email_field'] )
+						? $shaped_emails
+						: '';
 
 				} else { // Success!
 
 					$shaped_emails[]            = $email;
-					$new_input['email_field'] = isset( $this->options['email_field'] ) ? $shaped_emails : '';
+					$new_input['email_field'] = isset( $this->options['email_field'] )
+						? $shaped_emails
+						: '';
 
 				}
 			}
@@ -187,7 +190,9 @@ class Post_Notifier {
 
 			}
 
-			$new_input['post_type_field'] = isset( $this->options['post_type_field'] ) ? $selected_post_types : '';
+			$new_input['post_type_field'] = isset( $this->options['post_type_field'] )
+				? $selected_post_types
+				: '';
 
 		} else {
 
@@ -205,8 +210,12 @@ class Post_Notifier {
 		 * Sender email
 		 */
 
-		$sender_email                      = isset( $input['sender_email_field'] ) ? sanitize_email( $input['sender_email_field'] ) : '';
-		$new_input['sender_email_field']   = ! empty( $sender_email ) ? $sender_email : '';
+		$sender_email                    = isset( $input['sender_email_field'] )
+			? sanitize_email( $input['sender_email_field'] )
+			: '';
+		$new_input['sender_email_field'] = ! empty( $sender_email )
+			? $sender_email
+			: '';
 
 		return $new_input;
 
