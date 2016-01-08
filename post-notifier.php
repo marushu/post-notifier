@@ -18,7 +18,7 @@ if ( class_exists( 'Post_Notifier' ) ) {
 /**
  * Summary.
  *
- * @since 0.1.0
+ * @since  0.1.0
  * @access public
  */
 class Post_Notifier {
@@ -51,24 +51,24 @@ class Post_Notifier {
 	 *
 	 * @param string $new_status after published.
 	 * @param string $old_status before published.
-	 * @param object $post post object.
+	 * @param object $post       post object.
 	 */
 	public function post_published_notification( $new_status, $old_status, $post ) {
 
-		$options = get_option( 'post_notifier_settings' );
-		$emails  = isset( $options['email_field'] )
+		$options      = get_option( 'post_notifier_settings' );
+		$emails       = isset( $options['email_field'] )
 			? $options['email_field']
 			: '';
-		$post_types = isset( $options['post_type_field'] )
+		$post_types   = isset( $options['post_type_field'] )
 			? $options['post_type_field']
 			: '';
 		$sender_email = isset( $options['sender_email_field'] )
 			? $options['sender_email_field']
 			: get_option( 'admin_email' );
 
-		$title     = wp_trim_words( esc_html( $post->post_title ), 100, '…' );
-		$permalink = esc_url( get_permalink( intval( $post->ID ) ) );
-		$message = '';
+		$title       = wp_trim_words( esc_html( $post->post_title ), 100, '…' );
+		$permalink   = esc_url( get_permalink( intval( $post->ID ) ) );
+		$message     = '';
 		$attachments = array();
 
 		/**
@@ -109,7 +109,7 @@ class Post_Notifier {
 				return;
 			}
 
-			$to[] = sprintf( '%s', sanitize_email( $email ) );
+			$to[]      = sprintf( '%s', sanitize_email( $email ) );
 			$headers[] = 'Bcc:' . sanitize_email( $email );
 		}
 		$subject = sprintf( '%s' . PHP_EOL, trim( $title ) );
@@ -124,7 +124,7 @@ class Post_Notifier {
 
 			add_filter( 'wp_mail_from', function( $sender_email ) {
 				return sanitize_email( $sender_email );
-			});
+			} );
 
 			wp_mail( $to, $subject, $message, $headers, $attachments );
 
@@ -134,7 +134,7 @@ class Post_Notifier {
 	/**
 	 * Data sanitize.
 	 *
-	 * @param email, post-types $input Posted datas.
+	 * @param email , post-types $input Posted datas.
 	 * @return mixed
 	 */
 	public function data_sanitize( $input ) {
@@ -204,8 +204,8 @@ class Post_Notifier {
 		 * Sender email
 		 */
 
-		$sender_email = isset( $input['sender_email_field'] ) ? sanitize_email( $input['sender_email_field'] ) : '';
-		$new_input['sender_email_field'] = ! empty( $sender_email ) ? $sender_email : '';
+		$sender_email                      = isset( $input['sender_email_field'] ) ? sanitize_email( $input['sender_email_field'] ) : '';
+		$new_input['sender_email_field']   = ! empty( $sender_email ) ? $sender_email : '';
 
 		return $new_input;
 
@@ -302,11 +302,11 @@ class Post_Notifier {
 		$selected_post_types = isset( $options['post_type_field'] ) ? $options['post_type_field'] : '';
 
 		$args       = array(
-			'public'  => true,
+			'public' => true,
 		);
 		$output     = 'names';
 		$post_types = array_values( get_post_types( $args, $output ) );
-		$count = intval( count( $post_types ) );
+		$count      = intval( count( $post_types ) );
 
 		if ( ! empty( $post_types ) ) {
 
@@ -338,7 +338,8 @@ class Post_Notifier {
 		$sender_email = isset( $options['sender_email_field'] ) ? sanitize_email( $options['sender_email_field'] ) : '';
 		?>
 
-		<input type="text" name="post_notifier_settings[sender_email_field]" value="<?php echo esc_html( $sender_email ); ?>" size="30" maxlength="30">
+		<input type="text" name="post_notifier_settings[sender_email_field]"
+					 value="<?php echo esc_html( $sender_email ); ?>" size="30" maxlength="30">
 
 		<?php
 
