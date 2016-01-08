@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Post Notifier
- * Version: 0.5
+ * Version: 0.5.0
  * Description: Send information to the specified e-mail address when the post published.
  * Author: Shuhei Nishimura
  * Author URI: http://private.hibou-web.com
@@ -18,9 +18,8 @@ if ( class_exists( 'Post_Notifier' ) ) {
 /**
  * Summary.
  *
- * @since x.x.x
- * @access (private, protected, or public)
- * @var type $var Description.
+ * @since 0.1.0
+ * @access public
  */
 class Post_Notifier {
 
