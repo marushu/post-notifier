@@ -1,4 +1,4 @@
-=== Posts-notifier ===
+=== Post Notifier ===
 Contributors: (this should be a list of wordpress.org userid's)
 
 Tags: mail
